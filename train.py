@@ -5,6 +5,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.svm import LinearSVC
 from sklearn.calibration import CalibratedClassifierCV
 from sklearn.metrics import classification_report, accuracy_score
+from csv_schema import normalize_training_csv
 
 ROOT = Path(__file__).parent
 DATA = ROOT / "data" / "customer_feedback.csv"
@@ -12,7 +13,7 @@ MODELS = ROOT / "models"
 MODELS.mkdir(exist_ok=True)
 
 def main():
-    df = pd.read_csv(DATA).dropna(subset=["text","label"])
+    df, _schema = normalize_training_csv(pd.read_csv(DATA))
     X = df["text"].astype(str).values
     y = df["label"].values
 

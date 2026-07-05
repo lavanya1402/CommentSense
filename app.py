@@ -2,6 +2,7 @@ import joblib
 import streamlit as st
 import pandas as pd
 from pathlib import Path
+from csv_schema import normalize_prediction_csv
 
 st.set_page_config(page_title="CommentSense – Feedback Classifier", page_icon="💬", layout="centered")
 st.title("💬 CommentSense – Customer Feedback Classifier")
@@ -38,12 +39,18 @@ with tab1:
                     st.write(f"- **{c}**: {p:.2f}")
 
 with tab2:
-    file = st.file_uploader("Upload CSV with a 'text' column", type=["csv"])
+    file = st.file_uploader(
+        "Upload CSV with text, review, feedback, comment, or Xquik Tweet Text",
+        type=["csv"],
+    )
     if file is not None:
-        df = pd.read_csv(file)
-        if "text" not in df.columns:
-            st.error("CSV must include a 'text' column.")
+        try:
+            df, schema = normalize_prediction_csv(pd.read_csv(file))
+        except ValueError as error:
+            st.error(str(error))
         else:
+            if schema.dropped_rows:
+                st.info(f"Ignored {schema.dropped_rows} empty text row(s).")
             X = vec.transform(df["text"].astype(str))
             preds = clf.predict(X)
             out = df.copy()
