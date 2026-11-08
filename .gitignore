@@ -17,3 +17,7 @@ models/*.bin
 models/*.onnx
 data/*.parquet
 *.zip
+.ruff_cache/
+.pytest_cache/
+venv/
+!.env.example
